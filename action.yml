@@ -1,9 +1,24 @@
-name: 'docker-action'
+name: 'docker-deploy'
 
 description: 'Build push and deploy Docker image'
 inputs:
-  docker-compose-path:
+  COMPOSE-PATH:
     description: 'Path to the docker-compose file'
+    required: true
+  HOST:
+    description: 'Hostname of vps'
+    required: true
+  PORT:
+    description: 'ssh port of vps'
+    required: true
+  USERNAME:
+    description: 'ssh username of vps'
+    required: true
+  KEY:
+    description: 'ssh key of vps'
+    required: true
+  PASSPHRASE:
+    description: 'passphrase of ssh key of vps'
     required: true
 
 runs:
@@ -47,20 +62,13 @@ runs:
       - name: Deploy the new image
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
-          port: ${{ secrets.PORT }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
+          host: ${{ inputs.HOST }}
+          port: ${{ inputs.PORT }}
+          username: ${{ inputs.USERNAME }}
+          key: ${{ inputs.KEY }}
+          passphrase: ${{ inputs.PASSPHRASE }}
           script: |
-            cd ${{ inputs.docker-compose-path }}
+            cd ${{ inputs.COMPOSE-PATH }}
             docker compose down
             docker rmi ghcr.io/${{ github.repository }}:${{ github.ref_name }}
             docker compose up -d
-
-      - name: Discord Webhook Action
-        uses: tsickert/discord-webhook@v5.3.0
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          content: "${{ github.repository }} Update on vps"
