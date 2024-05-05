@@ -20,6 +20,9 @@ inputs:
   PASSPHRASE:
     description: 'passphrase of ssh key of vps'
     required: true
+  GHCR-TOKEN:
+    description: 'GitHub token for GitHub packages'
+    required: true
 
 runs:
   using: 'composite'
@@ -38,7 +41,7 @@ runs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ inputs.GHCR-TOKEN }}
 
       - name: Prepare metadata
         id: meta
